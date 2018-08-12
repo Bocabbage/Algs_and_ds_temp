@@ -1,4 +1,4 @@
-//优先队列模板类
+//优先队列(priority queue）模板类
 template<typename T>
 void exchange(T* a, T* b)
 {
