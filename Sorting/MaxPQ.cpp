@@ -1,3 +1,4 @@
+//优先队列模板类
 template<typename T>
 void exchange(T* a, T* b)
 {
