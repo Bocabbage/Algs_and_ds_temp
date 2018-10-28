@@ -4,6 +4,7 @@
 	时间渐进复杂度：θ(N)(其中辅助函数π的时间复杂度：θ（M))
 	【N为被搜索串长度，M为模式串长度】
 	更新时间：2018\10\21(已验证)
+			 2018\10\28(增加const修饰保护)
 */
 
 #include<iostream>
@@ -12,10 +13,10 @@ using std::string;
 using std::cout;
 using std::endl;
 
-void ComparePrefix(int preP[], int n, string &P);		// sub-method ：前缀函数
-void KMP(string &T, string &P);							// KMP-Algorithm
+void ComparePrefix(int preP[], int n,const string &P);		// sub-method ：前缀函数
+void KMP(const string &T,const string &P);					// KMP-Algorithm
 
-void KMP(string &T, string &P)
+void KMP(const string &T,const string &P)
 {
 	/* 参数：被搜索串T，模式串P */
 
@@ -41,7 +42,7 @@ void KMP(string &T, string &P)
 	delete[] preP;
 }
 
-void ComparePrefix(int preP[], int n, string &P)
+void ComparePrefix(int preP[], int n,const string &P)
 {	
 	/*参数：前缀记录数组，数组长度，模式串*/
 
