@@ -4,9 +4,9 @@
 #include<time.h>
 using std::string;
 using namespace std;
-const int PairsNums = 20000;		// 设置文件中T-P串对数量
-const int Tlen = 2000;				// 每组数据中被查找串长度
-const int Plen = 10;				// 每组数据中模式串长度
+const int PairsNums = 20000;				// 设置文件中T-P串对数量
+const int Tlen = 20000;				// 每组数据中被查找串长度
+const int Plen = 1000;					// 每组数据中模式串长度
 int main()
 {
 	srand((unsigned)time(NULL));

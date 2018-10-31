@@ -1,5 +1,5 @@
 #include"stringFind.h"
-
+const int DHash=5;
 
 /* BF算法*/
 int BF(const string& P,const string& T)
@@ -63,7 +63,7 @@ void ComparePrefix(int preP[], int n,const string &P)
 
 
 /*BM算法*/
-void getBC(int bc[],const string& P,int bc_n=256)
+void getBC(int bc[],const string& P)
 {
 	// Bad-Character抽象为Hash表来查询每个坏字符i匹配时
 	// 模式串应向前移动至bc[i]与坏字符对齐
@@ -73,10 +73,10 @@ void getBC(int bc[],const string& P,int bc_n=256)
 
 	const int len=P.length();
 	int i;
-	for(i=0;i<bc_n;i++)bc[i]=-1;		// 初始化为-1,表示该字符未在模式串中出现
+	for(i=0;i<DHash;i++)bc[i]=-1;		// 初始化为-1,表示该字符未在模式串中出现
 	for(i=0;i<len;i++)					// 从左向右遍历，记录最右位置覆盖保存
 		//bc[P[i]] = i;
-		bc[P[i]%3]=i;					// 针对ATCG的特化Hash函数
+		bc[P[i]%DHash]=i;					// 针对ATCG的特化Hash函数
 
 }
 
@@ -128,13 +128,13 @@ void get_suffix(int su[],const string& P)
 
 int max(int a,int b){return (a>b)?a:b;}
 
-int BM(const string& P,const string& T,int bc_n=256)	
+int BM(const string& P,const string& T)	
 {
 	const int pl=P.length();
 	const int tl=T.length();
-	int *bc = new int[bc_n];
+	int *bc = new int[DHash];
 	int *gs = new int[pl];
-	getBC(bc,P,bc_n);
+	getBC(bc,P);
 	getGS(gs,P);
 	int p=0;			// p指明P和T串当前匹配的第一个元素位置
 	int q;				// q指明当前比较的位置
@@ -143,7 +143,7 @@ int BM(const string& P,const string& T,int bc_n=256)
 		for(q=pl-1;q>=0 && P[q]==T[p+q];q--);
 		if(q==-1)break;
 		else
-			p+=max(gs[q],q-bc[T[p+q]%3]);		// 针对'ATCG'字符集的特化
+			p+=max(gs[q],q-bc[T[p+q]%DHash]);		// 针对'ATCG'字符集的特化
 	}
 	delete[] bc;
 	delete[] gs;
