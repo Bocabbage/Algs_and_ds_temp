@@ -52,25 +52,27 @@ class BinTree
 private:
 	int _size;				// 规模
 	BinNode<T>* _root;		// 树的根节点
+	virtual int updateHeight(BinNode<T>* x); // 更新节点x的高度√
+	void updateHeightAbove(BinNode<T>* x);	 // 更新节点x及其祖先的高度√
 public:
 	BinTree():_size(0),_root(nullptr){}
 	BinTree(T const& e){_size=1;root = new BinNode(e);}
 	~BinTree(){if(_size>0)remove(_root);}
 
-	BinNode<T>* root() const{return _root;}					// 返回树的根节点
-	int size() const{return _size;}							// 返回树的规模
-	bool empty() const{return !_root;}						// 判空
-	BinNode<T>* insertAsLC(BinNode<T>* x, T const& e);		// 元素作为左孩子接入
-	BinNode<T>* insertAsRC(BinNode<T>* x, T const& e);		// 元素作为右孩子接入
+	BinNode<T>* root() const{return _root;}					// 返回树的根节点√
+	int size() const{return _size;}							// 返回树的规模√
+	bool empty() const{return !_root;}						// 判空√
+	BinNode<T>* insertAsLC(BinNode<T>* x, T const& e);		// 元素作为左孩子接入√
+	BinNode<T>* insertAsRC(BinNode<T>* x, T const& e);		// 元素作为右孩子接入√
 	BinNode<T>* attachAsLC(BinNode<T>* x, T BinTree<T>* t);	// 作为左子树接入
 	BinNode<T>* attachAsRC(BinNode<T>* x, T BinTree<T>* t);	// 作为右子树接入
 	int remove(BinNode<T>* x);			// 删除以x处节点为根的子树，返回该子树规模
 
 	// 遍历(函数指针方式迭代实现)
-	void travLevel(void (*visit)(BinNode<T>* p));			// 层序遍历
-	void travPre(void (*visit)(BinNode<T>* p));				// 前序遍历
-	void travIn(void (*visit)(BinNode<T>* p));				// 中序遍历
-	void travPost(void (*visit)(BinNode<T>* p));			// 后序遍历
+	void travLevel(void (*visit)(BinNode<T>* p));			// 层序遍历√
+	void travPre(void (*visit)(BinNode<T>* p));				// 前序遍历√
+	void travIn(void (*visit)(BinNode<T>* p));				// 中序遍历√
+	void travPost(void (*visit)(BinNode<T>* p));			// 后序遍历√
 
 	void gotoHLVFL(stack<BinNode<T>*>& S)					// 后序遍历辅助函数
 	{
@@ -98,7 +100,7 @@ void BinTree<T>::travPre(void (*visit)(BinNode<T>* p))
 	BinNode<T>* temp=_root;
 	while(true)
 	{	
-		for(temp!=nullptr)
+		while(temp!=nullptr)
 		{
 			visit(temp);			// 访问根节点
 			S.push(temp->rChild);	// 右孩子入栈
@@ -164,3 +166,35 @@ void BinTree<T>::travLevel(void (*visit)(BinNode<T>* p))
 		if(temp->rChild!=nullptr)Q.push(temp->rChild);
 	}
 }
+
+template<typename T>
+int BinTree<T>::updateHeight(BinNode<T>* x)
+{
+	return x->height = 1 + (x->lChild->height > x->rChild->height?x->lChild->height:x->rChild->height)
+}
+
+template<typename T>
+void BinTree<T>::updateHeightAbove(BinNode<T>* x)
+{
+	while(x){updateHeight(x);x=x->parent;}	// 可优化：一旦高度不变即终止
+}
+
+template<typename T>
+BinNode<T>* BinTree<T>::insertAsLC(BinNode<T>* x, T const& e)
+{
+	_size++;
+	x->insertAsLC(e);
+	updateHeightAbove(x);
+	return x->lChild;
+}
+
+template<typename T>
+BinNode<T>* BinTree<T>::insertAsRC(BinNode<T>* x, T const& e)
+{
+	_size++;
+	x->insertAsRC(e);
+	updateHeightAbove(x);
+	return x->rChild;
+}
+
+
