@@ -5,6 +5,7 @@
 	|header|→|data[0]|→|data[1]|→....→|data[n-1]|→|trailer|
 
 	2018\9\29 维护无序双向链表接口(已验证)
+	2019\1\13 调整注释缩进格式
 	
 
 */
@@ -67,9 +68,9 @@ public:
 
 	// 构造函数
 	List(){init();}
-	List(List<T> const& L);						// 复制构造
-	List(List<T> const& L, int r,int n);		// 复制构造列表L自第r项起的n项
-	List(List<T> const& L, Node<T> *p, int n);	// 复制列表中自位置p起的n项
+	List(List<T> const& L);                     // 复制构造
+	List(List<T> const& L, int r,int n);        // 复制构造列表L自第r项起的n项
+	List(List<T> const& L, Node<T> *p, int n);  // 复制列表中自位置p起的n项
 	~List(){clear();}
 
 	// 只读访问接口
@@ -78,21 +79,21 @@ public:
 	T& operator[](int r) const;
 	Node<T>* first() const {return header->succ;}
 	Node<T>* last() const {return trailer->pred;}
-	bool disordered(bool ud=0) const;								// 判断链表是否有序
-	Node<T>* find(T const& e) const									// 全区间无序查找
+	bool disordered(bool ud=0) const;                               // 判断链表是否有序
+	Node<T>* find(T const& e) const                                 // 全区间无序查找
 	 {return find(e,_size,header->succ);}
-	Node<T>* find(T const& e, int n, Node<T>* p) const;				// 无序区间查找([p,p+n))
-	Node<T>* selectMax(Node<T>* p,int n);							// 在p及其前n-1个后继中选出最大者
+	Node<T>* find(T const& e, int n, Node<T>* p) const;             // 无序区间查找([p,p+n))
+	Node<T>* selectMax(Node<T>* p,int n);                           // 在p及其前n-1个后继中选出最大者
 	Node<T>* selectMax()
 	{return selectMax(header->succ,_size);}
 
 	//可写访问接口
-	Node<T>* insertAsFirst(T const& e);				// 将e作为首节点插入
-	Node<T>* insertAsLast(T const& e);				// 将e作为末节点插入
+	Node<T>* insertAsFirst(T const& e);              // 将e作为首节点插入
+	Node<T>* insertAsLast(T const& e);               // 将e作为末节点插入
 	Node<T>* insertBefore(Node<T>* p, T const& e);
 	Node<T>* insertAfter(Node<T>* p, T const& e);
-	T remove(Node<T>* p);							// 删除合法位置p处的节点，返回被删除节点
-	int deduplicate();								// 无序去重
+	T remove(Node<T>* p);                            // 删除合法位置p处的节点，返回被删除节点
+	int deduplicate();                               // 无序去重
 	//void reverse();
 
 
@@ -149,11 +150,11 @@ List<T>::List(List<T> const& L)
 template<typename T>
 List<T>::List(List<T> const& L, int r,int n)
 {	
-	int i;					// 计数用
+	int i;                    // 计数用
 	if(r>=L._size)exit(1);
 	Node<T>* temp=L.header->succ;
 	for(i=0;i<r;++i)
-		temp=temp->succ;	// 迭代结束得到L[r]
+		temp=temp->succ;      // 迭代结束得到L[r]
 
 	init();
 	for(i=0;i<n;++i)
@@ -186,8 +187,8 @@ bool List<T>::disordered(bool ud=0) const
 	//ud：	0	|	1	
 	//	  顺序	| 逆序 	
 
-	//return:	0	|	1	
-	//			有序|	无序
+	//return:	 0   |  1	
+	//          有序 | 无序
 
 	Node<T>* temp=first();
 	if(!ud)
@@ -211,13 +212,13 @@ Node<T>* List<T>::find(T const& e, int n, Node<T>* p) const
 	int i;
 	for(i=0;i<n;i++)
 	{
-		if(p==nullptr)exit(1);			// 查找已过trailer，p+n-1越界
+		if(p==nullptr)exit(1);// 查找已过trailer，p+n-1越界
 		else if(p->data == e)break;
 
 		p=p->succ;
 	}
 
-	if((i==n || p==trailer) && p->pred->data!=e)return nullptr;		// 注意！p->pred->data！(开区间搜索)
+	if((i==n || p==trailer) && p->pred->data!=e)return nullptr;// 注意！p->pred->data！(开区间搜索)
 	else return p;
 }
 
