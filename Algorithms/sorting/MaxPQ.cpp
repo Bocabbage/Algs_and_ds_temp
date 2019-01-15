@@ -67,6 +67,7 @@ T MaxPQ<T>::delMax()
 	exchange<T>(pq+1,pq+N);
 	pq[N--]=0;
 	sink(1);
+	return max;
 }
 
 template<typename T>

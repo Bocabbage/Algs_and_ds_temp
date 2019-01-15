@@ -73,10 +73,10 @@ void getBC(int bc[],const string& P)
 
 	const int len=P.length();
 	int i;
-	for(i=0;i<DHash;i++)bc[i]=-1;		// 初始化为-1,表示该字符未在模式串中出现
-	for(i=0;i<len;i++)					// 从左向右遍历，记录最右位置覆盖保存
+	for(i=0;i<DHash;i++)bc[i]=-1;        // 初始化为-1,表示该字符未在模式串中出现
+	for(i=0;i<len;i++)                   // 从左向右遍历，记录最右位置覆盖保存
 		//bc[P[i]] = i;
-		bc[P[i]%DHash]=i;					// 针对ATCG的特化Hash函数
+		bc[P[i]%DHash]=i;                // 针对ATCG的特化Hash函数
 
 }
 
@@ -94,8 +94,8 @@ void getGS(int gs[],const string& P)
 		gs[i]=len;
 	// 第二个循环：找到与后缀对应的最佳前缀(类似于KMP的子过程)
 	// 待优化(!)
-	for(i=len-1;i>=0;i--)	// 从后向前遍历,保证“安全移动”
-		if(suffix[i]==i+1)	// 存在一个前缀与后缀相同
+	for(i=len-1;i>=0;i--)    // 从后向前遍历,保证“安全移动”
+		if(suffix[i]==i+1)   // 存在一个前缀与后缀相同
 		{	Index = len-1-i;
 			for(int j=0;j<Index;j++)
 				if(gs[j]==len)gs[j]=Index;
@@ -136,14 +136,14 @@ int BM(const string& P,const string& T)
 	int *gs = new int[pl];
 	getBC(bc,P);
 	getGS(gs,P);
-	int p=0;			// p指明P和T串当前匹配的第一个元素位置
-	int q;				// q指明当前比较的位置
+	int p=0;        // p指明P和T串当前匹配的第一个元素位置
+	int q;          // q指明当前比较的位置
 	while(tl>=(pl+p))
 	{
 		for(q=pl-1;q>=0 && P[q]==T[p+q];q--);
 		if(q==-1)break;
 		else
-			p+=max(gs[q],q-bc[T[p+q]%DHash]);		// 针对'ATCG'字符集的特化
+			p+=max(gs[q],q-bc[T[p+q]%DHash]);  // 针对'ATCG'字符集的特化
 	}
 	delete[] bc;
 	delete[] gs;
