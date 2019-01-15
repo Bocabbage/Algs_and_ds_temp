@@ -1,111 +1,225 @@
 /*
-	项目：无向连通图-最小生成树(Minimum Spanning Tree)
-	实现方法：Kruskal(并查集与最小堆实现) / Prim(最小堆实现)
-	更新日期：2018\12\8(已验证)
+Graph类(有向赋权图)
+实现思路：邻接链表实现，有向/无向取决于使用方式
+提供深度/广度遍历接口，未提供泛用接口
+若需提升泛用性，使用时添加Vertex结构来记录顶点属性，
+再扩展泛用接口
+更新时间：2018\12\11
+
 */
+#define INF 5000					// 定义无连接时情况
+#include<queue>
+#include<stack>
+#include<iostream>
+using std::stack;
+using std::queue;
+using std::cout;
+using std::endl;
 
-#include"MST.h"
-
-void Kruskal(Graph g, VEV *MST)
+struct Edge
 {
-	/*
-		Kruskal-Algorithm:扩边法
-		接受参数：图(Graph)，返回的MST(点-边-点三元组数组)
-		构建最小生成树：
-			扫描二维矩阵：O(n^2)
-			建堆时间复杂度(insert)：O(eloge)
-			O(e)次出堆(Deltop)：O(eloge)，
-			O(e)次并查集IsConnect()：O(elogn)
-			n-1次Union(): O(n)
-		总时间复杂度: O(n^2+n+eloge+elogn)
-	*/
-	int N = g.n;
-	UnionFind uf(N);				// 辅助并查集
-	Heap h(N*(N + 1) / 2, false);	// 辅助最小堆
-	// 辅助临时变量
-	int i, j;
-	VEV temp;
+	int endpoint;
+	double weight;
+	Edge* Next;
+};
 
-	for (i = 0; i<N; ++i)
-		for (j = i+1; j<N; ++j)
-		{	
-			// 扫描矩阵，边入堆
-			if (g.G[i][j] == INF)continue;
-			temp.Endpoint1 = i;
-			temp.Endpoint2 = j;
-			temp.ConnectWeight = g.G[i][j];
-			h.insert(temp);
-		}
-	
-	int index = 0;
-	while (/*index<N-1*/uf.Count()>1)
+class Graph
+{
+private:
+	int v_nums;									// 顶点个数
+	Edge** G;									// 邻接表数组
+	void release(int k);						// 释放链表
+	double checkWeight(int m, int n)const;		// 查看两顶点间权值
+	int FirstNeighbour(int m)const;
+	int NextNeighbour(int m, int n)const;
+public:
+	Graph() :v_nums(0), G(nullptr) {}
+	Graph(double *g, int n);			// 接受一张二维邻接矩阵(n*n)
+	Graph(Graph& g);
+	~Graph() { for (int i = 0; i<v_nums; ++i)release(i); }
+	void BFS(int n);				// 广度优先搜索接口：不提供泛用接口
+	void DFS(int n);				// 深度优先搜索接口：不提供泛用接口
+	void checkPrint();				// 输出邻接表进行检查
+
+};
+
+double Graph::checkWeight(int m, int n)const
+{
+	if (m>v_nums - 1 || n>v_nums - 1 || m<0 || n<0)exit(0);
+	Edge* temp = G[m];
+	while (temp != nullptr)
 	{
-		// 出堆，生成MST
-		temp = h.top();
-		h.Deltop();
-		if (!uf.IsConnect(temp.Endpoint1, temp.Endpoint2))
+		if (temp->endpoint == n)return temp->weight;
+		temp = temp->Next;
+	}
+	return INF;
+}
+
+void Graph::checkPrint()
+{
+	for (int i = 0; i<v_nums; ++i)
+	{
+		Edge* temp = G[i];
+		cout << i << ':';
+		while (temp != nullptr)
 		{
-			MST[index++] = temp;
-			uf.Union(temp.Endpoint1, temp.Endpoint2);
+			cout << temp->endpoint << ' ';
+			temp = temp->Next;
+		}
+		cout << endl;
+	}
+}
+
+void Graph::release(int k)
+{
+	Edge* temp;
+	while (G[k] != nullptr)
+	{
+		temp = G[k];
+		G[k] = temp->Next;
+		delete temp;
+	}
+}
+
+int Graph::FirstNeighbour(int m)const
+{
+	if (G[m] == nullptr)exit(0);
+	int MinNeighbour = -1;
+	int MinWeight = INF;
+	Edge* temp = G[m];
+	while (temp != nullptr)
+	{
+		if ((temp->weight)<MinWeight)
+		{
+			MinNeighbour = temp->endpoint;
+			MinWeight = temp->weight;
+		}
+		temp = temp->Next;
+	}
+	return MinNeighbour;
+}
+
+int Graph::NextNeighbour(int m, int n)const
+{
+	if (G[m] == nullptr)exit(0);
+	int nWeight = checkWeight(m, n);
+	int MinNeighbour = -1;
+	int MinWeight = INF;
+	Edge* temp = G[m];
+	while (temp != nullptr)
+	{
+		if ((temp->weight)<MinWeight && (temp->weight)>nWeight)
+		{
+			MinNeighbour = temp->endpoint;
+			MinWeight = temp->weight;
+		}
+		temp = temp->Next;
+	}
+	return MinNeighbour;
+}
+
+Graph::Graph(double *g, int n)
+{
+	v_nums = n;
+	G = new Edge*[n];
+	Edge* temp1;
+	Edge* temp2;
+	bool isNull;
+	for (int i = 0; i<n; ++i)
+	{
+		temp1 = nullptr;
+		temp2 = nullptr;
+		isNull = true;
+		for (int j = 0; j<n; ++j)
+			if (g[i*n + j] != INF && g[i*n + j] != 0)
+			{
+				temp1 = temp2;
+				temp2 = new Edge;
+				temp2->endpoint = j;
+				temp2->Next = nullptr;
+				temp2->weight = g[i*n + j];
+				if (isNull)
+				{
+					G[i] = temp2;
+					isNull = false;
+					continue;
+				}
+				temp1->Next = temp2;
+			}
+	}
+}
+
+Graph::Graph(Graph& g)
+{
+	v_nums = g.v_nums;
+	G = new Edge*[v_nums];
+	Edge* temp1;
+	Edge* temp2;
+	Edge* tempg;
+	bool isNull;
+	for (int i = 0; i<v_nums; ++i)
+	{
+		tempg = g.G[i];
+		temp1 = nullptr;
+		temp2 = nullptr;
+		isNull = true;
+		while (tempg != nullptr)
+		{
+			temp1 = temp2;
+			temp2 = new Edge;
+			temp2->endpoint = tempg->endpoint;
+			temp2->weight = tempg->weight;
+			tempg = tempg->Next;
+			if (isNull)
+			{
+				isNull = false;
+				G[i] = temp2;
+				continue;
+			}
+			temp1->Next = temp2;
 		}
 	}
 }
 
-void Prim(Graph g, VEV* MST)
+void Graph::BFS(int n = 0)
 {
-	/*
-		Prim-Algorithm：扩点法
-		接受参数：图(Graph)，返回的MST(点-边-点三元组数组)
-		构建最小生成树：
-			总迭代次数：O(n)，每次迭代：
-				平均堆插入2e/n次：O(eloge/n)
-				e条边从堆中删除：O(eloge)
-		总时间复杂度：O(neloge)
-	*/
-	int N = g.n;
-	Heap h(N*(N + 1) / 2, false);	// 辅助最小堆
-	bool *VinMST = new bool[N];		// 记录顶点是否在MST中的bool数组
-	// 辅助变量
-	int i;
-	int u, v;
-	VEV temp;
-	for (i = 0; i<N; ++i)
-		VinMST[i] = false;
-	u = 0;
-	VinMST[u] = true;
-	int count = 0;	// 已纳入MST的顶点数
+	// 注：不适用于带权值最短路问题
+	if (n>v_nums - 1 || n<0)exit(0);
+	int i, deque;
+	int scanTemp;
+	int counts = 0;
+	queue<int> Q;
+	enum ScanColor { white, grey, black };
+	ScanColor *Color = new ScanColor[v_nums];
+	for (i = 0; i<v_nums; i++)Color[i] = white;
 
-	do
+	Q.push(n);
+	Color[n] = grey;
+	while (!Q.empty() && counts<v_nums)
 	{
-		v = g.FindFirstNeighbour(u);
-		while (v != -1)
+		deque = Q.front();
+		Q.pop();
+		cout << deque << ' ';
+		counts++;
+		Color[deque] = black;
+		scanTemp = FirstNeighbour(deque);
+		while (scanTemp != -1)
 		{
-			if (!VinMST[v])
+			if (Color[scanTemp] == white)
 			{
-				// 注意此处赋值的顶点顺序
-				temp.Endpoint2 = u;
-				temp.Endpoint1 = v;
-				temp.ConnectWeight = g.G[u][v];
-				h.insert(temp);
-			}
-			v = g.FindNextNeighbour(u, v);
-		}
+				Q.push(scanTemp);
+				Color[scanTemp] = grey;
 
-		while ((!h.isEmpty()) && count < N-1)	// 注意此处为n-1
-		{
-			temp = h.top();
-			h.Deltop();
-			if (!VinMST[temp.Endpoint1])
-			{	
-				// 若点不在MST内则纳入
-				MST[count++] = temp;
-				u = temp.Endpoint1;
-				VinMST[u] = true;
-				break;
 			}
+			scanTemp = NextNeighbour(deque, scanTemp);
 		}
+	}
 
-	} while (count<N-1);
+	delete Color;
+}
+
+void Graph::DFS(int n = 0)
+{
 
 }
 
@@ -118,16 +232,6 @@ int main()
 					INF,INF,INF,22, 0,  25, 24,
 					10, INF,INF,INF,25, 0,  INF,
 					INF,14, INF,18, 24, INF,0 };
-	VEV mst[6];
-	Graph g(7);
-	g.readData(G, 7);
-	//Kruskal(g, mst);
-	Prim(g, mst);
-	for (int i = 0; i < 6; ++i)
-	{
-		cout << "EndPoint1:" << mst[i].Endpoint1 << '\t';
-		cout << "EndPoint2:" << mst[i].Endpoint2 << '\t';
-		cout << "ConnectWeight:" << mst[i].ConnectWeight << '\t';
-		cout << endl;
-	}
+	Graph g(G, 7);
+	g.BFS(0);
 }
