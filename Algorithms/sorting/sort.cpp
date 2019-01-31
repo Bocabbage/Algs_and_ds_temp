@@ -1,4 +1,9 @@
-#inlcude<ctime>		//for randomizing of partition
+/*
+	项目：SORT算法模板
+	更新时间：2019\1\31(修改merge方法的bug)
+*/
+
+#include<ctime>		//for randomizing of partition
 template<typename T>
 void exchange(T* a, T* b)
 {
@@ -103,10 +108,10 @@ void merge(T a[],int lo,int mid,int hi,bool reverse)	//in-place merge
 	int i=lo;
 	int j=mid+1;
 
-	for (int k = 0; k < hi+1; ++k)	//copy a[] to aux[]
+	for (int k = lo; k < hi+1; ++k)	//copy a[] to aux[]
 		aux[k]=a[k];
 	if(reverse)			
-		for (int k = 0; k < hi+1; ++k)
+		for (int k = lo; k < hi+1; ++k)
 		{
 			if(i>mid)a[k]=aux[j++];		//remains nothing in a[lo...mid]
 			else if(j>hi)a[k]=aux[i++]; //remains nothing in a[mid+1...hi]
@@ -114,7 +119,7 @@ void merge(T a[],int lo,int mid,int hi,bool reverse)	//in-place merge
 			else a[k]=aux[i++];					//compare and select
 		}
 	else
-		for (int k = 0; k < hi+1; ++k)
+		for (int k = lo; k < hi+1; ++k)
 		{
 			if(i>mid)a[k]=aux[j++];		//remains nothing in a[lo...mid]
 			else if(j>hi)a[k]=aux[i++]; //remains nothing in a[mid+1...hi]
