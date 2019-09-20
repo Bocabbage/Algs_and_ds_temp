@@ -24,9 +24,6 @@ def Recursive_FFT(arr):
     y0 = Recursive_FFT(a_0)
     y1 = Recursive_FFT(a_1)
 
-    print("{}:y_0:{}".format(Len,y0))
-    print("{}:y_1:{}".format(Len,y1))
-
     Omega = 1
     Omega_n = exp(2*pi*1j/Len)
 
