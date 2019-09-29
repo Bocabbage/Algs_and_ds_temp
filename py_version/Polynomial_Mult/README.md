@@ -25,3 +25,4 @@ $$
 a_j = \frac{1}{2}(B_{even}({\omega}^{\frac{-k}{2}}_{\frac{n}{2}}) - B_{odd}({\omega}^{\frac{-k}{2}}_{\frac{n}{2}}){\omega}^{-k}_n)
 \end{align}
 $$
+
